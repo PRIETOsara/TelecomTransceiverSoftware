@@ -11,7 +11,7 @@ CDR_BYPASS_TX = [1,1,1,1]
 CDR_BYPASS_RX = [1,1,1,1]
 RX_AMPLIFIER = [5,2,2,2]
 class FinisarManager:
-    def __init__(self, vid=0x2086, pid=0x1115):
+    def __init__(self, vid=0x2086, pid=0x1114):
         # 1. Initialize Device
         self.dev = usb.core.find(idVendor=vid, idProduct=pid)
         if self.dev is None:
