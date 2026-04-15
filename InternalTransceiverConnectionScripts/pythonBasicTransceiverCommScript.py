@@ -3,6 +3,8 @@ import usb.util
 import time
 import sys
 
+# First approach for PC-FInisar3 Connection
+
 VID = 0x2086
 PID = 0x1115
 EP_OUT = 0x02

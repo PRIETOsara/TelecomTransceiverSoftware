@@ -3,13 +3,19 @@ import usb.util
 import time
 import sys
 
+# --------------------------------PARAMETERS------------------------------------------
+
+# Varibles to change the parameters: Value = [Lane0,Lane1,Lane2,Lane3]
+# Input values from 0 to 1 unless specified otherwise.
 TX_DIS = [0,0,0,0]
 RX_DIS = [0,0,0,0]
 TX_SQUEILCH_DIS = [0,0,0,0]
 RX_SQUEILCH_DIS = [0,0,0,0]
-CDR_BYPASS_TX = [1,1,1,1]
-CDR_BYPASS_RX = [1,1,1,1]
-RX_AMPLIFIER = [5,2,2,2]
+CDR_BYPASS = [1,1,1,1]  # Both for Tx and Rx
+RX_AMPLIFIER = [5,2,2,2]    # Values from 0 to 15
+
+# --------------------------------------CLASS------------------------------------------
+
 class FinisarManager:
     def __init__(self, vid=0x2086, pid=0x1114):
         # 1. Initialize Device
@@ -119,6 +125,8 @@ class FinisarManager:
         r2 = self._send_command([0x08, 0x00, 0xda, 0xa0, 0,0,0,0, 0x08, 0x00, 0x9a, 0x62, 0,0,0,0, 0x08, 0x00, 0xba, rx_val, 0,0,0,0, 0,0,0,0, 0,0,0,0])
         return [r1, r2]
 
+# ---------------------------------MAIN--------------------------------------------
+
 def main():
     fm = FinisarManager()
     print("--- Finisar EUIG3 Multilane Controller ---")
@@ -141,7 +149,7 @@ def main():
     # Example 3: Set CDR Bypass on Page 00
     fm.set_page(0)
     # Bypass all CDRs for raw signal testing
-    ack_cdr = fm.set_cdr_bypass_all(CDR_BYPASS_TX)
+    ack_cdr = fm.set_cdr_bypass_all(CDR_BYPASS)
     print(f"CDR All Bypassed. Acks: {ack_cdr}")
 
     fm.set_page(0)
