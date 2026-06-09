@@ -12,12 +12,12 @@ RX_DIS = [0,0,0,0]
 TX_SQUEILCH_DIS = [0,0,0,0]
 RX_SQUEILCH_DIS = [0,0,0,0]
 CDR_BYPASS = [1,1,1,1]  # Both for Tx and Rx
-RX_AMPLIFIER = [5,2,2,2]    # Values from 0 to 15
+RX_AMPLIFIER = [6,6,6,6]    # Values from 0 to 15
 
 # --------------------------------------CLASS------------------------------------------
 
 class FinisarManager:
-    def __init__(self, vid=0x2086, pid=0x1114):
+    def __init__(self, vid=0x2086, pid=0x1115):
         # 1. Initialize Device
         self.dev = usb.core.find(idVendor=vid, idProduct=pid)
         if self.dev is None:

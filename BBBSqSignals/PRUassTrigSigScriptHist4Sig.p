@@ -91,65 +91,21 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 0, 1
-	//LED_ON 
-SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
+	//LED_ON
+FASTLOOP:
 	MOV		r30, 0x00000001 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
-	MOV		r5, r14
-SIGNALON1DEL:
-	SUB		r5, r5, 1
-	QBNE	SIGNALON1DEL, r5, 0
-//	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
-SIGNALOFF1: // Make use of this dead time to instantly correct for intra relative frequency sifference
-	MOV		r30, 0x00000000 // All off
-	MOV		r5, r15
 	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-SIGNALOFF1DEL:
-	SUB		r5, r5, 1
-	QBNE	SIGNALOFF1DEL, r5, 0
-SIGNALON2:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
-	MOV		r30, 0x00000002 // Double channels 2. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
-	MOV		r5, r14
-SIGNALON2DEL:
-	SUB		r5, r5, 1
-	QBNE	SIGNALON2DEL, r5, 0
-//	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
-SIGNALOFF2: // Make use of this dead time to instantly correct for intra relative frequency sifference
-	MOV		r30, 0x00000000 // All off
-	MOV		r5, r15
 	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-SIGNALOFF2DEL:
-	SUB		r5, r5, 1
-	QBNE	SIGNALOFF2DEL, r5, 0
-SIGNALON3:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
-	MOV		r30, 0x00000004 // Double channels 2. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
-	MOV		r5, r14
-SIGNALON3DEL:
-	SUB		r5, r5, 1
-	QBNE	SIGNALON3DEL, r5, 0
-//	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
-SIGNALOFF3: // Make use of this dead time to instantly correct for intra relative frequency sifference
-	MOV		r30, 0x00000000 // All off
-	MOV		r5, r15
+	MOV		r30, 0x00000002 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
 	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-SIGNALOFF3DEL:
-	SUB		r5, r5, 1
-	QBNE	SIGNALOFF3DEL, r5, 0
-SIGNALON4:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
-	MOV		r30, 0x00000008 // Double channels 2. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
-	MOV		r5, r14
-SIGNALON4DEL:
-	SUB		r5, r5, 1
-	QBNE	SIGNALON4DEL, r5, 0
-//	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
-SIGNALOFF4: // Make use of this dead time to instantly correct for intra relative frequency sifference
-	MOV		r30, 0x00000000 // All off
-	MOV		r5, r15
 	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-SIGNALOFF4DEL:
-	SUB		r5, r5, 1
-	QBNE	SIGNALOFF4DEL, r5, 0
+	MOV		r30, 0x00000004 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
+	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	MOV		r30, 0x00000008 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
+	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 JMPLOOP:
-	JMP	SIGNALON1//	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
+	JMP	FASTLOOP//	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
 EXIT:
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	HALT
@@ -159,3 +115,71 @@ ERR:	// Signal error
 //	JMP INITIATIONS
 //	JMP ERR
 	HALT
+
+//SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
+//	MOV		r30, 0x00000001 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
+//	MOV		r5, r14
+//SIGNALON1DEL:
+//	SUB		r5, r5, 1
+//	QBNE	SIGNALON1DEL, r5, 0
+////	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
+//SIGNALOFF1: // Make use of this dead time to instantly correct for intra relative frequency sifference
+//	MOV		r30, 0x00000000 // All off
+//	MOV		r5, r15
+//	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+//SIGNALOFF1DEL:
+//	SUB		r5, r5, 1
+//	QBNE	SIGNALOFF1DEL, r5, 0
+//SIGNALON2:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
+//	MOV		r30, 0x00000002 // Double channels 2. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
+//	MOV		r5, r14
+//SIGNALON2DEL:
+//	SUB		r5, r5, 1
+//	QBNE	SIGNALON2DEL, r5, 0
+////	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
+//SIGNALOFF2: // Make use of this dead time to instantly correct for intra relative frequency sifference
+//	MOV		r30, 0x00000000 // All off
+//	MOV		r5, r15
+//	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+//SIGNALOFF2DEL:
+//	SUB		r5, r5, 1
+//	QBNE	SIGNALOFF2DEL, r5, 0
+//SIGNALON3:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
+//	MOV		r30, 0x00000004 // Double channels 2. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
+//	MOV		r5, r14
+//SIGNALON3DEL:
+//	SUB		r5, r5, 1
+//	QBNE	SIGNALON3DEL, r5, 0
+////	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
+//SIGNALOFF3: // Make use of this dead time to instantly correct for intra relative frequency sifference
+//	MOV		r30, 0x00000000 // All off
+//	MOV		r5, r15
+//	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+//SIGNALOFF3DEL:
+//	SUB		r5, r5, 1
+//	QBNE	SIGNALOFF3DEL, r5, 0
+//SIGNALON4:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
+//	MOV		r30, 0x00000008 // Double channels 2. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
+//	MOV		r5, r14
+//SIGNALON4DEL:
+//	SUB		r5, r5, 1
+//	QBNE	SIGNALON4DEL, r5, 0
+////	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
+//SIGNALOFF4: // Make use of this dead time to instantly correct for intra relative frequency sifference
+//	MOV		r30, 0x00000000 // All off
+//	MOV		r5, r15
+//	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+//SIGNALOFF4DEL:
+//	SUB		r5, r5, 1
+//	QBNE	SIGNALOFF4DEL, r5, 0
+//JMPLOOP:
+//	JMP	SIGNALON1//	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
+//EXIT:
+//	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+//	HALT
+//ERR:	// Signal error
+//	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
+//	//LED_ON
+////	JMP INITIATIONS
+////	JMP ERR
+//	HALT
