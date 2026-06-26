@@ -92,28 +92,50 @@ CMDLOOP2:// Double verification of host sending start command
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 0, 1
 	//LED_ON
+// Define your native PASM macros
+.macro PIN_DELAY
+    LDI        r4, 0
+    LDI        r4, 0
+.endm
+
+.macro PIN_DELAYOFF
+    LDI        r4, 0
+.endm
+
+.macro JMP_DELAY
+    LDI        r4, 0
+    LDI        r4, 0
+.endm
+
 FASTLOOP:
-	MOV		r30, 0x00000001 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	MOV		r30, 0x00000002 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	MOV		r30, 0x00000004 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
-	MOV		r30, 0x00000008 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+    MOV        r30, 0x00000001 
+    PIN_DELAY
+    
+    MOV        r30, 0x00000000 
+
+    MOV        r30, 0x00000002 
+    PIN_DELAY
+    
+    MOV        r30, 0x00000000 
+
+    MOV        r30, 0x00000004 
+    PIN_DELAY
+    
+    MOV        r30, 0x00000000 
+
+    MOV        r30, 0x00000008 
+    JMP_DELAY
+
 JMPLOOP:
-	JMP	FASTLOOP//	LDI		r4, 0 // Controlled intentional delay to account for the fact that QBNE takes one extra count when it does not go through the barrier
+    JMP        FASTLOOP
 EXIT:
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	HALT
 ERR:	// Signal error
 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
 	//LED_ON
-//	JMP INITIATIONS
-//	JMP ERR
+	JMP INITIATIONS
+	JMP ERR
 	HALT
 
 //SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
