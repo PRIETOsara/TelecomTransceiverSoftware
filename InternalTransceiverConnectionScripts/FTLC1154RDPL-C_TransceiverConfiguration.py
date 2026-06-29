@@ -7,12 +7,12 @@ import sys
 
 # Varibles to change the parameters: Value = [Lane0,Lane1,Lane2,Lane3]
 # Input values from 0 to 1 unless specified otherwise.
-TX_DIS = [0,0,0,0]
-RX_DIS = [0,0,0,0]
+TX_DIS = [1,1,0,1]
+RX_DIS = [0,0,1,1]
 TX_SQUEILCH_DIS = [0,0,0,0]
 RX_SQUEILCH_DIS = [0,0,0,0]
-CDR_BYPASS = [1,1,1,1]  # Both for Tx and Rx
-RX_AMPLIFIER = [6,6,6,6]    # Values from 0 to 15
+CDR_BYPASS = [0,0,0,0]  # Both for Tx and Rx
+RX_AMPLIFIER = [1,1,1,1]    # Values from 0 to 15
 
 RX_RS_MSB = [0,0,0,0]
 RX_RS_LSB = [0,0,0,0]
