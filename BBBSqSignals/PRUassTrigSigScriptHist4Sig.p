@@ -130,7 +130,7 @@ FASTLOOP:
     PIN_DELAY
 
     MOV        r30, 0x00000000
-
+    
 JMPLOOP:
     JMP        FASTLOOP
 EXIT:
