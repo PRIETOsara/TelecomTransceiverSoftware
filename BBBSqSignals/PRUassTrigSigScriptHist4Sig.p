@@ -91,62 +91,7 @@ CMDLOOP2:// Double verification of host sending start command
 	LBCO	r0.b0, CONST_PRUDRAM, 0, 1 // Load to r0 the content of CONST_PRUDRAM with offset 4, and 1 bytes
 	QBEQ	CMDLOOP, r0.b0, 0 // loop until we get an instruction
 	SBCO	r4.b0, CONST_PRUDRAM, 0, 1
-	//LED_ON
-// // Define native PASM macros
-// .macro PIN_DELAY
-//     LDI        r4, 0
-//     LDI        r4, 0 
-// .endm
 
-// .macro PIN_DELAYOFF
-//     LDI        r4, 0
-//     LDI        r4, 0
-// .endm
-
-// .macro JMP_DELAY
-//     LDI        r4, 0
-// .endm
-
-// .macro JMP_DELAYOFF
-//     LDI        r4, 0
-// .endm
-
-// FASTLOOP:
-//     MOV        r30, 0x00000001 
-//     PIN_DELAY
-    
-//     MOV        r30, 0x00000000
-//     PIN_DELAYOFF
-
-//     MOV        r30, 0x00000002 
-//     PIN_DELAY
-    
-//     MOV        r30, 0x00000000
-//     PIN_DELAYOFF
-
-//     MOV        r30, 0x00000004 
-//     PIN_DELAY
-    
-//     MOV        r30, 0x00000000
-//     PIN_DELAYOFF
-
-//     MOV        r30, 0x00000008
-//     PIN_DELAY
-
-//     MOV        r30, 0x00000000
-//     JMP_DELAYOFF
-    
-// JMPLOOP:
-//     JMP        FASTLOOP
-// EXIT:
-// 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-// 	HALT
-// ERR:	// Signal error
-// 	SET     r30.t11	// enable the data bus. it may be necessary to disable the bus to one peripheral while another is in use to prevent conflicts or manage bandwidth.
-// 	//LED_ON
-// 	//JMP INITIATIONS
-// 	//JMP ERR
-// 	HALT
 
 SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
 	MOV		r30, 0x00000001 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
