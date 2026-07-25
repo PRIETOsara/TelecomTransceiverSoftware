@@ -19,3 +19,5 @@ Here is a quick map of how the project is organized:
 * **`InternalTransceiverConnectionScripts/`** – Python scripts necessaries to access internally the QSFP28 modules.
 * **`Tools`** – Includes helper shell scripts (`.sh`) for automating tasks, configuring pin layouts, setting up PWM, launching PRU signal generation, and compiling/deploying code directly to the BBB.
 * **`am335x_pru_package`** – A public library integrated to initialize and interface with the PRU subsystem of the AM335x processor on the BBB.
+
+---
