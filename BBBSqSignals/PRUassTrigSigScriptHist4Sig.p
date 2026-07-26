@@ -145,7 +145,7 @@ SIGNALON4DEL:
 SIGNALOFF4: // Make use of this dead time to instantly correct for intra relative frequency sifference
 	MOV		r30, 0x00000000 // All off
 	MOV		r5, r15
-	LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+	//LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 SIGNALOFF4DEL:
 	SUB		r5, r5, 1
 	QBNE	SIGNALOFF4DEL, r5, 0
