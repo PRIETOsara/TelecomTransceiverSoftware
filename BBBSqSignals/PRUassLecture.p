@@ -1,5 +1,4 @@
-// --- SCRIPT MINIMAL DE PRU ---
-// Solo mantiene la lógica de interrupciones Host → PRU y PRU → Host
+// --- PULSE READER PRU ---
 
 .origin 0
 .entrypoint INIT
@@ -7,65 +6,50 @@
 #include "PRUassLecture.hp"
 
 #define PIN_MASK 0x0F
-// r31  input register
-// r30  output register
-// r1   for pulse counting
-// r2   actual sample
-// r3   number of iterations. 2 000 000 means 0,1s. 20 000 000 means 1s.
-// r12  previous detection (1 or 0)
-// r7   final valid value
 
-// r6 for 0 detections
-// r12 for 1 detections
+// r1  = pulses detectedd counter
+// r2  = previous sample
+// r3  = remaining iterations(2 muestras por iteracion, 12 ciclos = 60 ns), stops counting when 0.
+// r7  = edge detections
+// r12 = actual sample
+// r14 = destino en shared RAM
 
 INIT:
-    // Habilitar OCP (obligatorio para Shared RAM y comunicación con ARM)
+    // Habilitar OCP (obligatorio para Shared RAM y comunicacion con ARM)
     LBCO    r0, CONST_PRUCFG, 4, 4
     CLR     r0, r0, 4
     SBCO    r0, CONST_PRUCFG, 4, 4
     MOV     r14, 0x10000
 
 MAIN_LOOP:
-    // Esperar interrupción del host (bit 30 de r31)
     QBBC    MAIN_LOOP, r31, 30
+    LDI     r0, 21                  // ARM_PRU0_INTERRUPT
+    SBCO    r0, C0, 0x24, 4         // SICR: limpia el evento 21
 
-    // Limpiar la interrupción del host
-    MOV     r0, 0
-    SBCO    r0, C0, 0x24, 1   // Limpia host interrupt (R31.30)
-    MOV     r1, 0           
-    MOV     r3, 2000000 // sample window
-COUNT_LOOP:
+    LDI     r1, 0
+    MOV     r3, 8333333             // time window = r3 * 60 ns = 0,250 s
+    AND     r12, r31, PIN_MASK      // Initial sample
+    NOT     r2, r12                 // Previous sample while inverting it
 
-    MOV     r12, r31
-    AND     r12, r12, PIN_MASK      // Selecting just the four first bits.
-    NOT     r12, r12                // Inverting the first sample, as the constraint is to have a 0 before a 1
+COUNT_LOOP:                         // 
+    AND     r12, r31, PIN_MASK      // 1. Selecting just the four first bits of r31 and saving into r12
+    AND     r7,  r12, r2            // 2. As r2 is inverted, when doing and, just 1 if the previous sample has detected a zero
+    NOT     r2,  r12                // 3. The actual from the previous becomes now the previous
+    MIN     r7,  r7, 1              // 4. If r7 register a pulse in channel 4, 3 or 2 will count 8, 5 or 2 respectively. Min compares r7 with 1 and selects the minimum, will be 1 or 0.
+    ADD     r1,  r1, r7             // 5. Sum 0 o 1
+    SUB     r3,  r3, 1              // 6. Substracting one to the counter r3
+    AND     r12, r31, PIN_MASK      // 7. Selecting the following sample
+    AND     r7,  r12, r2            // 8. And so on
+    NOT     r2,  r12                // 9
+    MIN     r7,  r7, 1              // 10
+    ADD     r1,  r1, r7             // 11
+    QBNE    COUNT_LOOP, r3, 0       // 12
 
-    MOV     r2, r31                 // Copying the register 31 in r2 (the value has moved 3 instructions = 15ns)
-    AND     r2, r2, PIN_MASK 
-
-    AND     r7, r2, r12             // If r12 has detected some pulse, r7 = 0 and discarted
-    MIN     r7, r7, 1               // r7 will contain the lower value: 0 or 1
-    
-    QBEQ    LOOP_END, r7, 0         // If not detected jump, skip EDGE_DETECTED
-
-EDGE_DETECTED:
-    ADD     r1, r1, 1
-    MOV     r7, 0
-
-LOOP_END:
-    SUB     r3, r3, 1
-    QBNE    COUNT_LOOP, r3, 0
-
-    // Enviar interrupción al host
     SBBO    r1, r14, 0, 4
     MOV     r31.b0, PRU0_ARM_INTERRUPT + 16
-
-    // Regresar al loop para esperar la siguiente interrupción
     JMP     MAIN_LOOP
+
 EXIT:
     HALT
-ERR:    // Signal error
-    //LED_ON
-    //JMP INITIATIONS
-    //JMP ERR
+ERR:
     HALT
