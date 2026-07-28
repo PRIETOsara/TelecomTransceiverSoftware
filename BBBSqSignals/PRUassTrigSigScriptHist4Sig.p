@@ -65,7 +65,7 @@ INITIATIONS:
 	
 	MOV	r30, 0
 	MOV	r14, 2 // ON state
-	MOV	r15, 2 // OFF state
+	MOV	r15, 3 // OFF state
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
 	LDI	r4, 0 // zeroing

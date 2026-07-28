@@ -137,7 +137,7 @@ int CKPD::HandleInterruptSynchPRU() {
         
         printf("------------------------------------------------\n");
         printf("FINAL RESULT (time window):\n");
-        printf(" -> Pulsos Totales: %d\n", totalPulsos);
+        printf(" -> Total pulses: %d\n", totalPulsos);
         /*printf(" -> Pulsos Totales CH1: %d\n", totalPulsosCH1);
         printf(" -> Pulsos Totales CH2: %d\n", totalPulsosCH2);
         printf(" -> Pulsos Totales CH3: %d\n", totalPulsosCH3);

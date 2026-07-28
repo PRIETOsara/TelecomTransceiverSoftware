@@ -27,7 +27,7 @@ MAIN_LOOP:
     SBCO    r0, C0, 0x24, 4         // SICR: limpia el evento 21
 
     LDI     r1, 0
-    MOV     r3, 8333333             // time window = r3 * 60 ns = 0,250 s
+    MOV     r3, 4166666             // time window = r3 * 60 ns = 0,250 s
     AND     r12, r31, PIN_MASK      // Initial sample
     NOT     r2, r12                 // Previous sample while inverting it
 
@@ -43,6 +43,10 @@ COUNT_LOOP:                         //
     NOT     r2,  r12                // 9
     MIN     r7,  r7, 1              // 10
     ADD     r1,  r1, r7             // 11
+    LDI     r4,  0
+    LDI     r4,  0
+    LDI     r4,  0
+    LDI     r4,  0
     QBNE    COUNT_LOOP, r3, 0       // 12
 
     SBBO    r1, r14, 0, 4
