@@ -116,7 +116,7 @@ void handle_signal(int sig) {
 
 // Main acquisition function adapted for 10s measurement window
 int CKPD::HandleInterruptSynchPRU() {
-    printf("\n[HOST] Iniciando medicion de 10 segundos...\n");
+    printf("\n[HOST] Measure of 0.25s...\n");
     pru0dataMem_int[0] = 1;
     // 1) Trigger PRU via the memory handshake (pru0dataMem_int points to OWN_RAM + 0x200)
     prussdrv_pru_send_event(21);
@@ -127,7 +127,7 @@ int CKPD::HandleInterruptSynchPRU() {
     if (ret > 0) {
         // PRU signaled completion
         prussdrv_pru_clear_event(PRU_EVTOUT_0, PRU0_ARM_INTERRUPT);
-        printf("TODO GUAY");
+        printf("Everything OK");
         // Read result: PRU wrote total pulses into sharedMem_int[0]
         unsigned int totalPulsos = sharedMem_int[0];
         /*unsigned int totalPulsosCH1 = sharedMem_int[0];
@@ -136,7 +136,7 @@ int CKPD::HandleInterruptSynchPRU() {
         unsigned int totalPulsosCH4 = sharedMem_int[3];*/
         
         printf("------------------------------------------------\n");
-        printf("RESULTADO FINAL (Ranura de tiempo):\n");
+        printf("FINAL RESULT (time window):\n");
         printf(" -> Pulsos Totales: %d\n", totalPulsos);
         /*printf(" -> Pulsos Totales CH1: %d\n", totalPulsosCH1);
         printf(" -> Pulsos Totales CH2: %d\n", totalPulsosCH2);
