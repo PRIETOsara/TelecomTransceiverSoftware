@@ -64,7 +64,7 @@ INITIATIONS:
 	SBBO	r0, r10, 0, 4//SBCO	r0, CONST_PRUDRAM, 0, 4  // Load the base address of PRU0 Data RAM into C
 	
 	MOV	r30, 0
-	MOV	r14, 10 // ON state
+	MOV	r14, 2 // ON state
 	MOV	r15, 3 // OFF state
 	MOV	r11, 0x02220111
 	MOV	r12, 0x08880444
@@ -81,16 +81,14 @@ CMDLOOP2:// Double verification of host sending start command
 .macro PIN_DELAY
     LDI    r4, 0
     LDI	   r4, 0
-    LDI    r4, 0
-    LDI	   r4, 0
 .endm
 .macro PIN_DELAY4
     LDI    r4, 0
-    LDI    r4, 0
-    LDI	   r4, 0
 .endm
 .macro PIN_DELAYOFF
     LDI    r4, 0
+    LDI    r4, 0
+    LDI	   r4, 0
     LDI    r4, 0
 .endm
 
@@ -117,7 +115,9 @@ FASTLOOP:
     PIN_DELAY
 
     MOV        r30, 0x00000000 
-    LDI		   r4,	0
+    LDI		   r4, 0
+    LDI	   	   r4, 0
+    LDI    	   r4, 0
 
 // SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
 // 	MOV		r30, 0x00000001 // Double channels 1. write to magic r30 output byte 0. Half word bytes= 7,6,5,4,3,2,1,0 bits
@@ -175,7 +175,7 @@ FASTLOOP:
 // SIGNALOFF4: // Make use of this dead time to instantly correct for intra relative frequency sifference
 // 	MOV		r30, 0x00000000 // All off
 // 	MOV		r5, r15
-// 	// LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
+// 	//LDI		r4, 0 // Intentionally controlled delay to adjust all sequences (in particular to the last one)
 // 	PIN_DELAY4
 // SIGNALOFF4DEL:
 // 	SUB		r5, r5, 1
