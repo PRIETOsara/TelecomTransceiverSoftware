@@ -114,7 +114,7 @@ private:// Variables
 	// PRU clock generation
 	unsigned int PRU1QuarterClocksAux=static_cast<unsigned int>(this->NumClocksQuarterPeriodPRUclock);
 	int retInterruptsPRU1;
-	int WaitTimeInterruptPRU1=1500000;
+	int WaitTimeInterruptPRU1=15000000;
 	int WaitTimeInterruptPRU0=15000000; // In microseconds
 	unsigned int MinNumPeriodColcksPRUnoHalt=1000;// Protection againts very low numbers
 	unsigned int MaxNumPeriodColcksPRUnoHalt=200000000;// Protecion agains very large numbers
