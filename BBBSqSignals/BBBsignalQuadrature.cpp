@@ -14,6 +14,11 @@
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
 
+// >>> QSFP: minimal I2C control for laser (Tx) and detector (Rx) on/off.
+// Put QsfpI2c.h next to this .cpp (the header is self-contained).
+#include "QsfpI2c.h"
+// <<< QSFP
+
 #define PRU_ClockPhys_NUM 1    // PRU1
 #define PRU_HandlerSynch_NUM 0 // PRU0
 
@@ -60,6 +65,12 @@ int CKPD::mem_fd = -1;
 
 CKPD* g_agentInstance = nullptr;
 
+// >>> QSFP: one global I2C handle. Opened once, lives for the process.
+//      Non-fatal if /dev/i2c-2 is missing (qsfp_ok stays false).
+static QsfpI2c g_qsfp;
+static bool    g_qsfp_ok = false;
+// <<< QSFP
+
 // Global / module-local timeout (microseconds) for waiting PRU interrupt.
 // If the header already defines WaitTimeInterruptPRU0, you can remove this line there.
 // Setting to 15 seconds to be safe (PRU counts 10s).
@@ -95,13 +106,23 @@ CKPD::CKPD() {
     }
     sleep(1); // let PRUs initialize
     LOCAL_DDMinit();
-    
+
     // Initialize time tracking variables if present in header/class
     // These members assumed to exist in the header: TimePointClockCurrentInitial, TimeAdjPeriod, etc.
     this->TimePointClockCurrentInitial = ClockWatch::now();
     this->requestWhileWait = this->SetWhileWait();
 
-    cout << "Sistemas iniciados. Generando reloj y listo para adquirir..." << endl;
+    // >>> QSFP: bring up I2C and leave the module with lasers ON, detectors ON.
+    g_qsfp_ok = g_qsfp.ok();
+    if (g_qsfp_ok) {
+        g_qsfp.laser_on();      // P0 b86 = 0x00  TX all 4 lasers enabled
+        g_qsfp.detector_on();   // P3 b241 = 0x00 RX all 4 detectors enabled (no-op on LR4-40G)
+    } else {
+        cerr << "[QSFP] /dev/i2c-2 not available; laser/detector control disabled\n";
+    }
+    // <<< QSFP
+
+    cout << "System initiated. Generating pulse bursts and ready to acquire..." << endl;
 }
 
 // Signal handler
@@ -114,6 +135,14 @@ void handle_signal(int sig) {
 // Main acquisition function adapted for 10s measurement window
 int CKPD::HandleInterruptSynchPRU() {
     printf("\n[HOST] Measure of 0.25s...\n");
+
+    // >>> QSFP: lasers ON for the measurement window.
+    if (g_qsfp_ok){
+        //g_qsfp.laser_on();   // TX all 4 lasers enabled
+        g_qsfp.detector_on();   // RX all 4 detectors disabled
+    }
+    // <<< QSFP
+
     pru1dataMem_int[0] = 1; // Command to action
     // Start generator PRU1
     prussdrv_pru_send_event(22);
@@ -121,7 +150,7 @@ int CKPD::HandleInterruptSynchPRU() {
     pru0dataMem_int[0] = 1;
     // 1) Trigger PRU via the memory handshake (pru0dataMem_int points to OWN_RAM + 0x200)
     prussdrv_pru_send_event(21);
-    
+
     // 2) Wait for PRU0 to finish (PRU0 will raise PRU_EVTOUT_0 when done)
     int ret = prussdrv_pru_wait_event_timeout(PRU_EVTOUT_0, WaitTimeInterruptPRU0);
 
@@ -135,7 +164,7 @@ int CKPD::HandleInterruptSynchPRU() {
         unsigned int totalPulsosCH2 = sharedMem_int[1];        
         unsigned int totalPulsosCH3 = sharedMem_int[2];
         unsigned int totalPulsosCH4 = sharedMem_int[3];*/
-        
+
         printf("------------------------------------------------\n");
         printf("FINAL RESULT (time window):\n");
         printf(" -> Total pulses: %d\n", totalPulsos);
@@ -162,6 +191,14 @@ int CKPD::HandleInterruptSynchPRU() {
         prussdrv_pru_clear_event(PRU_EVTOUT_1, PRU1_ARM_INTERRUPT);
         cout << "Error en prussdrv_pru_wait_event_timeout()" << endl;
     }
+
+    // >>> QSFP: lasers OFF after the measurement window.
+    if (g_qsfp_ok){
+    //    g_qsfp.laser_off();  // TX all 4 lasers disabled
+        g_qsfp.detector_off();   // RX all 4 detectors disabled
+    }
+    // <<< QSFP
+
     return 0;
 }
 
@@ -214,6 +251,13 @@ int CKPD::DisablePRUs() {
 }
 
 CKPD::~CKPD() {
+    // >>> QSFP: leave the module in a sane state (lasers ON, detectors ON).
+    if (g_qsfp_ok) {
+        g_qsfp.laser_off();      // TX all 4 lasers disabled
+        g_qsfp.detector_off();   // RX all 4 detectors disabled
+    }
+    // <<< QSFP
+
     // Safety cleanup
     this->Killsignalpru();
     this->DisablePRUs();
