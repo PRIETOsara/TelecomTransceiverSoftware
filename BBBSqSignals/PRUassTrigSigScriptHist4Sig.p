@@ -59,8 +59,9 @@
 .macro PIN_DELAYOFF
     LDI    r4, 0
     LDI    r4, 0
-    LDI	   r4, 0
     LDI    r4, 0
+    LDI    r4, 0
+
 .endm
 
 INITIATIONS:
@@ -116,7 +117,8 @@ FASTLOOP:
 
     MOV        r30, 0x00000000 
     LDI		   r4, 0
-    LDI	   	   r4, 0
+    LDI        r4, 0
+
 //    LDI    	   r4, 0
 
 // SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off

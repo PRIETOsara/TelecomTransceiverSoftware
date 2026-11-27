@@ -25,10 +25,16 @@ sudo config-pin P9_19 i2c 2>/dev/null || true   # SCL_2
 sudo config-pin P9_20 i2c 2>/dev/null || true   # SDA_2
 
 # ---1. First step go to page 00
-i2cset -y 2 0x50 127 0         2>/dev/null || true   # Back to Page 0
+i2cset -y 2 0x50 127 0x00         2>/dev/null || true   # Back to Page 0
+
+# Trigger software reset
+i2cset -y 2 0x50 93 0x80        2>/dev/null || true
+
+# Allow the module to restart
+sleep 0.5
 
 # Force into low power mode first (usually clears some temporary states)
-i2cset -y 2 0x50 93 0x01
+i2cset -y 2 0x50 93 0x01      2>/dev/null || true
 sleep 0.5
 # Then set to high power mode
 #i2cset -y 2 0x50 93 0x00
@@ -38,7 +44,7 @@ sleep 0.5
 i2cset -y 2 0x50 98 0x00       2>/dev/null || true
 
 # ---- 2. Gain & Squelch (Page 3) -------------------------------------------
-i2cset -y 2 0x50 127 0x03         2>/dev/null || true   # Select Page 3
+i2cset -y 2 0x50 127 0x03      2>/dev/null || true   # Select Page 3
 
 # TX Gain / Input Equalization (Bytes 234 & 235)
 i2cset -y 2 0x50 234 0x00      2>/dev/null || true
@@ -50,8 +56,8 @@ i2cset -y 2 0x50 238 0x33      2>/dev/null || true
 i2cset -y 2 0x50 239 0x33      2>/dev/null || true  
 
 # Rate select
-i2cset -y 2 0x50 87 0x00    2>/dev/null || true   # RX: all 4 lanes set to lowest rate
-i2cset -y 2 0x50 88 0x00  2>/dev/null || true    # TX: all 4 lanes set to lowest rate
+i2cset -y 2 0x50 87 0x00       2>/dev/null || true   # RX: all 4 lanes set to lowest rate
+i2cset -y 2 0x50 88 0x00       2>/dev/null || true    # TX: all 4 lanes set to lowest rate
 
 # Disable squelch
 i2cset -y 2 0x50 240 0xFF      2>/dev/null || true
@@ -62,10 +68,9 @@ new=$((old | 0x0C))
 i2cset -y 2 0x50 93 $new
 
 # ---- 3. Back to Page 0 & Enable Lasers / High Power -----------------------
-i2cset -y 2 0x50 127 0         2>/dev/null || true   # Back to Page 0
+i2cset -y 2 0x50 127 0x00      2>/dev/null || true   # Back to Page 0
 i2cset -y 2 0x50 86 0x00       2>/dev/null || true   # Enable all 4 TX lasers (0x00 = ON)
 i2cset -y 2 0x50 93 0x00       2>/dev/null || true   # High Power Mode ON
-
 
 # ----- Missing registers ------------
 # ---- PAGE 00h ----
@@ -97,3 +102,5 @@ i2cset -y 2 0x50 241 0x00     2>/dev/null || true
 
 # Return to Page 00h
 i2cset -y 2 0x50 127 0x00     2>/dev/null || true
+
+

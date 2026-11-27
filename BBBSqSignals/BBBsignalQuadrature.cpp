@@ -140,7 +140,9 @@ int CKPD::HandleInterruptSynchPRU() {
     if (g_qsfp_ok){
         //g_qsfp.laser_on();   // TX all 4 lasers enabled
         g_qsfp.detector_on();   // RX all 4 detectors disabled
+        sleep(1);
     }
+
     // <<< QSFP
 
     pru1dataMem_int[0] = 1; // Command to action
