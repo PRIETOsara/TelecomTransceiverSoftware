@@ -8,11 +8,13 @@ import smbus
 import math
 import time
 import curses
+import threading
 
 BUS = 2
 ADDRESS = 0x50
 PAGE_SELECT = 127   # byte 127 selects which upper page (128-255) is visible
 REFRESH = 1.0       # seconds between readings
+I2C_TIMEOUT = 2.0   # seconds before an I2C operation is considered stuck
 
 RX_AMP = {0: "100-400mV", 1: "300-600mV", 2: "400-800mV", 3: "600-1200mV"}
 
@@ -34,6 +36,35 @@ HELP = [
     "  r <page> <byte>       w <page> <byte> <value>       dump       help",
     "  ESC or Ctrl+C = quit",
 ]
+
+
+# ---------------------------------------------------------------- I2C timeout guard
+# smbus calls can block inside the kernel if the bus gets stuck (SDA held low).
+# Each I2C operation runs in a worker thread; if it does not finish in time the
+# screen keeps working and shows a warning. Only one worker runs at a time, so a
+# stuck call does not pile up more blocked threads behind it.
+_worker = None
+
+def i2c_call(func, *args, timeout=I2C_TIMEOUT):
+    global _worker
+    if _worker is not None and _worker.is_alive():
+        raise IOError("I2C still stuck from a previous call (check module / bus)")
+    result = {}
+
+    def run():
+        try:
+            result['value'] = func(*args)
+        except Exception as e:
+            result['error'] = e
+
+    _worker = threading.Thread(target=run, daemon=True)
+    _worker.start()
+    _worker.join(timeout)
+    if _worker.is_alive():
+        raise IOError("I2C not responding after %.1f s (bus stuck?)" % timeout)
+    if 'error' in result:
+        raise result['error']
+    return result['value']
 
 
 # ---------------------------------------------------------------- low-level I2C
@@ -195,9 +226,10 @@ def main(screen):
         # 1) read the module once per second
         if time.time() >= next_read:
             try:
-                lines = status_lines(bus)
+                lines = i2c_call(status_lines, bus)
             except IOError as e:
-                lines = ["I2C error: %s  (is the module inserted?)" % e]
+                lines = ["I2C error: %s  (is the module inserted?)" % e,
+                         "  last read: %s" % time.strftime("%H:%M:%S")]
             next_read = time.time() + REFRESH
 
         # 2) draw the screen
@@ -218,7 +250,7 @@ def main(screen):
                 show_help = not show_help
             elif typed.strip():
                 try:
-                    message = run_command(bus, typed.strip())
+                    message = i2c_call(run_command, bus, typed.strip())
                 except (ValueError, IndexError) as e:
                     message = "Bad command (%s). Type 'help'." % e
                 except IOError as e:
@@ -230,7 +262,9 @@ def main(screen):
         elif 32 <= key < 127:                          # normal character
             typed += chr(key)
 
-    bus.close()
+    # Do not block on close if a worker is still stuck in the kernel
+    if _worker is None or not _worker.is_alive():
+        bus.close()
 
 if __name__ == "__main__":
     try:
