@@ -52,6 +52,20 @@
 .macro PIN_DELAY
     LDI    r4, 0
     LDI	   r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+
 .endm
 .macro PIN_DELAY4
     LDI    r4, 0
@@ -59,7 +73,18 @@
 .macro PIN_DELAYOFF
     LDI    r4, 0
     LDI    r4, 0
-    LDI	   r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
     LDI    r4, 0
 .endm
 
@@ -115,8 +140,21 @@ FASTLOOP:
     PIN_DELAY
 
     MOV        r30, 0x00000000 
-    LDI		   r4, 0
-    LDI	   	   r4, 0
+// Equivalent to PIN_DELAYOFF (accounting for the other functions)
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+    LDI    r4, 0
+
 //    LDI    	   r4, 0
 
 // SIGNALON1:	// The odd signals actually carry the signal (so it is half of the period, adjusting the on time); while the even signals are the half period alway off
