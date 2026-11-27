@@ -138,11 +138,11 @@ int CKPD::HandleInterruptSynchPRU() {
 
     // >>> QSFP: lasers ON for the measurement window.
     if (g_qsfp_ok){
-        //g_qsfp.laser_on();   // TX all 4 lasers enabled
+        g_qsfp.laser_on();   // TX all 4 lasers enabled
+        sleep(1.0);
         g_qsfp.detector_on();   // RX all 4 detectors disabled
-        sleep(1);
+        sleep(0.5);
     }
-
     // <<< QSFP
 
     pru1dataMem_int[0] = 1; // Command to action
@@ -196,7 +196,7 @@ int CKPD::HandleInterruptSynchPRU() {
 
     // >>> QSFP: lasers OFF after the measurement window.
     if (g_qsfp_ok){
-    //    g_qsfp.laser_off();  // TX all 4 lasers disabled
+        g_qsfp.laser_off();  // TX all 4 lasers disabled
         g_qsfp.detector_off();   // RX all 4 detectors disabled
     }
     // <<< QSFP

@@ -28,14 +28,13 @@ sudo config-pin P9_20 i2c 2>/dev/null || true   # SDA_2
 i2cset -y 2 0x50 127 0x00         2>/dev/null || true   # Back to Page 0
 
 # Trigger software reset
-i2cset -y 2 0x50 93 0x80        2>/dev/null || true
-
+#i2cset -y 2 0x50 93 0x80        2>/dev/null || true
 # Allow the module to restart
-sleep 0.5
+#sleep 0.5
 
 # Force into low power mode first (usually clears some temporary states)
-i2cset -y 2 0x50 93 0x01      2>/dev/null || true
-sleep 0.5
+#i2cset -y 2 0x50 93 0x01      2>/dev/null || true
+#sleep 0.5
 # Then set to high power mode
 #i2cset -y 2 0x50 93 0x00
 #sleep 1
@@ -74,33 +73,33 @@ i2cset -y 2 0x50 93 0x00       2>/dev/null || true   # High Power Mode ON
 
 # ----- Missing registers ------------
 # ---- PAGE 00h ----
-i2cset -y 2 0x50 127 0x00     2>/dev/null || true
+#i2cset -y 2 0x50 127 0x00     2>/dev/null || true
 
 # LPMode / signal configuration
-i2cset -y 2 0x50 99 0x00      2>/dev/null || true
+#i2cset -y 2 0x50 99 0x00      2>/dev/null || true
 
 # Interrupt masks
-for reg in 100 101 102 103 104; do
-    i2cset -y 2 0x50 "$reg" 0x00    2>/dev/null || true
-done
+#for reg in 100 101 102 103 104; do
+#    i2cset -y 2 0x50 "$reg" 0x00    2>/dev/null || true
+#done
 
 # ---- PAGE 03h ----
-i2cset -y 2 0x50 127 0x03     2>/dev/null || true
+#i2cset -y 2 0x50 127 0x03     2>/dev/null || true
 
 # Optional FEC control
-i2cset -y 2 0x50 230 0x00     2>/dev/null || true
+#i2cset -y 2 0x50 230 0x00     2>/dev/null || true
 
 # Tx Forced Squelch
-i2cset -y 2 0x50 231 0x00     2>/dev/null || true
+#i2cset -y 2 0x50 231 0x00     2>/dev/null || true
 
 # Rx Output Emphasis
-i2cset -y 2 0x50 236 0x3F     2>/dev/null || true
-i2cset -y 2 0x50 237 0x3F     2>/dev/null || true
+#i2cset -y 2 0x50 236 0x3F     2>/dev/null || true
+#i2cset -y 2 0x50 237 0x3F     2>/dev/null || true
 
 # Rx Output Disable
-i2cset -y 2 0x50 241 0x00     2>/dev/null || true
+#i2cset -y 2 0x50 241 0x00     2>/dev/null || true
 
 # Return to Page 00h
-i2cset -y 2 0x50 127 0x00     2>/dev/null || true
+#i2cset -y 2 0x50 127 0x00     2>/dev/null || true
 
 
